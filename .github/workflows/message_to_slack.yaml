@@ -1,0 +1,53 @@
+name: Send Slack Notifications
+
+on:
+  pull_request:
+    types: [review_requested]
+
+jobs:
+  build:
+    if: github.event.requested_team.name == 'dummy'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post to a Slack channel
+        id: slack_bot
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: 'C04RE9XAE0J'
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "New Pull Request in ${{ github.repository }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Pull Request:*\n${{ github.event.pull_request.html_url }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Created by:*\n<https://github.com/${{ github.event.pull_request.user.login }}|${{ github.event.pull_request.user.login }}>"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Please <!subteam^S051DD2AJG1> take a look"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
